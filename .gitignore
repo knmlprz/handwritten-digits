@@ -1,2 +1,3 @@
-*/.ipynb_checkpoints
-Notebooks/datasets
+src/handwritten-digits/Notebooks/.ipynb_checkpoints
+src/handwritten-digits/Notebooks/datasets/*
+src/handwritten-digits/__pycache__/
