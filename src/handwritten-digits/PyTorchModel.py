@@ -1,9 +1,7 @@
-from PIL import Image
-
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 
 def prepare_image(im, output_size=28):
@@ -23,10 +21,8 @@ def prepare_image(im, output_size=28):
     original_size = ptim.size()
       
     # Find the digit in the image
-    top, left = torch.amin(torch.stack(
-        torch.where(ptim > back_val)), dim=1)
-    bottom, right = torch.amax(torch.stack(
-        torch.where(ptim > back_val)), dim=1)
+    top, left = torch.amin(torch.stack(torch.where(ptim > back_val)), dim=1)
+    bottom, right = torch.amax(torch.stack(torch.where(ptim > back_val)), dim=1)
     center = torch.tensor([
         (top.item() + bottom.item()) // 2, 
         (left.item() + right.item()) // 2,
@@ -35,8 +31,7 @@ def prepare_image(im, output_size=28):
     
     # Make a padding if the (center + radius) is biger 
     # then an input image or (center - radius) < 0.
-    if (sum(center + imrad < torch.tensor(ptim.size())) < 2 
-        or sum(center - imrad > 0) < 2):
+    if sum(center + imrad < torch.tensor(ptim.size())) < 2 or sum(center - imrad > 0) < 2:
         
         br_offsite = abs(min(torch.tensor(ptim.size()) - (center + imrad)))
         tl_offsite = abs(min(center - imrad))
@@ -49,8 +44,8 @@ def prepare_image(im, output_size=28):
     bottomc, rightc = center + imrad
     ptim = ptim[topc:bottomc, leftc:rightc]
     ptim = ptim.view(1, 1, *ptim.size())
-    ptim = T.Resize(size=[output_size-4, output_size-4])(ptim)
-    ptim = T.Pad(padding=2, fill=back_val)(ptim)
+    ptim = T.Resize(size=[output_size-2, output_size-2])(ptim)
+    ptim = T.Pad(padding=1, fill=back_val)(ptim)
     mean, std = ptim.mean(), ptim.std()
     ptim = T.Normalize(mean, std)(ptim)
     orig_size_ptim = T.Resize(size=original_size)(ptim)
