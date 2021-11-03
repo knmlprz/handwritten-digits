@@ -19,7 +19,6 @@ def prepare_image(im, output_size=28, blur_kernel_size=7):
     # Convert to grayscale PyTorch Tensor
     ptim = T.ToTensor()(T.Grayscale()(im)).squeeze()
     back_val = min(ptim.flatten()).item()
-    original_size = ptim.size()
       
     # Find the digit in the image
     top, left = torch.amin(torch.stack(torch.where(ptim > back_val)), dim=1)
@@ -44,6 +43,7 @@ def prepare_image(im, output_size=28, blur_kernel_size=7):
     topc, leftc = center - imrad
     bottomc, rightc = center + imrad
     ptim = ptim[topc:bottomc, leftc:rightc]
+    original_size = ptim.size()
     ptim = ptim.view(1, 1, *ptim.size())    # same as .unsqueeze(dim=0) applied twice
     ptim = T.GaussianBlur(kernel_size=(7, 7), sigma=(0.1, 7))(ptim)
     ptim = T.Resize(size=[output_size-2, output_size-2])(ptim)

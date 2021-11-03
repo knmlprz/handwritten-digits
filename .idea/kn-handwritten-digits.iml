@@ -5,7 +5,7 @@
       <excludeFolder url="file://$MODULE_DIR$/src/handwritten-digits/Notebooks/datasets/MNIST" />
       <excludeFolder url="file://$MODULE_DIR$/src/handwritten-digits/Notebooks/.ipynb_checkpoints" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.8 (PyTorch)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
   <component name="PyDocumentationSettings">
