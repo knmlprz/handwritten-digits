@@ -4,7 +4,7 @@ import torchvision.transforms as T
 # import matplotlib.pyplot as plt
 
 
-def prepare_image(im, output_size=28):
+def prepare_image(im, output_size=28, blur_kernel_size=7):
     """Prepares an image for training
     
     Parameters
@@ -13,10 +13,11 @@ def prepare_image(im, output_size=28):
             An input image.
         output_size : integer, optional
             The size of the output image. Default 28.
+        blur_kernel_size : integer, optional
+            The size of the Gaussian blur kernel. Default 7.
     """
     # Convert to grayscale PyTorch Tensor
-    ptim = T.ToTensor()(T.Grayscale()(im))
-    ptim = ptim.view(*ptim.size()[1:])
+    ptim = T.ToTensor()(T.Grayscale()(im)).squeeze()
     back_val = min(ptim.flatten()).item()
     original_size = ptim.size()
       
@@ -39,11 +40,12 @@ def prepare_image(im, output_size=28):
         ptim = T.Pad(padding=pad.item(), fill=back_val)(ptim)
         center += pad
     
-    # Crop, resize and normalize the image
+    # Crop, blur, resize and normalize the image
     topc, leftc = center - imrad
     bottomc, rightc = center + imrad
     ptim = ptim[topc:bottomc, leftc:rightc]
-    ptim = ptim.view(1, 1, *ptim.size())
+    ptim = ptim.view(1, 1, *ptim.size())    # same as .unsqueeze(dim=0) applied twice
+    ptim = T.GaussianBlur(kernel_size=(7, 7), sigma=(0.1, 7))(ptim)
     ptim = T.Resize(size=[output_size-2, output_size-2])(ptim)
     ptim = T.Pad(padding=1, fill=back_val)(ptim)
     mean, std = ptim.mean(), ptim.std()

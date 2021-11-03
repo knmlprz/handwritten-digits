@@ -53,7 +53,7 @@ class Paint:
         self.old_x = e.x
         self.old_y = e.y
 
-    def reset(self):
+    def reset(self, _):
         self.old_x = None
         self.old_y = None      
            
