@@ -29,13 +29,14 @@ class Paint:
 
         self.old_x = None
         self.old_y = None
-        self.penwidth = 30
+        self.penwidth = 32
         self.pred_number = tk.StringVar()
         self.pred_number.set("---")
         self.draw_widgets()
         self.c.bind('<B1-Motion>', self.paint)
         self.c.bind('<ButtonRelease-1>', self.reset)
         self.Classifier = Classifier()
+        self._perm_error_message_shown = False
 
     def paint(self, e):
         if self.old_x and self.old_y:
@@ -64,12 +65,23 @@ class Paint:
     def ready(self):
         tmp_canvas = "tmp_canvas.eps"
         self.c.postscript(file=tmp_canvas)
+        # Windows users must install ghostscript properly from the following webpage:
+        # https://www.ghostscript.com/releases/index.html (GNU Affero General Public License)
         EpsImagePlugin.gs_windows_binary = r"C:\Program Files\gs\gs9.55.0\bin\gswin64c"
         im = Image.open(tmp_canvas)
         val, _ = self.Classifier.predict(im)
         self.pred_number.set(str(val))
-        del im
-        os.remove(tmp_canvas)
+        try:
+            os.remove(tmp_canvas)
+        except PermissionError:
+            if not self._perm_error_message_shown:
+                print(
+                    f"Temporary file {os.path.abspath(tmp_canvas)} cannot be deleted, "
+                    f"because the Matplotlib window is open."
+                    )
+                self._perm_error_message_shown = True
+            else:
+                pass
 
     def draw_widgets(self):
         self.clear_b.pack(side=tk.LEFT)

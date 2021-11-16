@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.transforms as T
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 def prepare_image(im, output_size=28, blur_kernel_size=7):
@@ -88,13 +88,22 @@ class CNN(nn.Module):
 class Classifier:
 
     def __init__(self):
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = CNN()
-        self.model.load_state_dict(torch.load("Notebooks/models/model.pth"))
+        if device == "cuda":
+            self.model.cuda()
+        self.model.load_state_dict(torch.load(
+            "Notebooks/models/model.pth",
+            map_location=torch.device(device)
+            ))
 
     def predict(self, image):
         prepim, orig_size_prepim = prepare_image(image)
-        # plt.imshow(prepim[0][0])
-        # plt.show()
+        plt.cla()
+        plt.imshow(prepim[0][0])
+        plt.xticks([])
+        plt.yticks([])
+        plt.show()
         with torch.no_grad():
             output = self.model(prepim)
 
